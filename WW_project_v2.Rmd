@@ -1,0 +1,108 @@
+---
+title: "WW_project_v2"
+output: html_document
+date: "2026-11-01"
+---
+```{r, echo = FALSE}
+#libs and global settings 
+
+library(knitr)
+opts_chunk$set(
+  echo = FALSE, warning = FALSE, message = FALSE
+)
+```
+
+## Introduction 
+
+Wastewater based epidemiology(WBE) has reemerged as a public health surveillance tool for tracking infectious diseases at the community level through the analysis of sewage. Increased interest occurred during the COVID-19 (SARS-COV-2) pandemic, with the Centers for Disease Control and Prevention (CDC) establishing the National Wastewater Surveillance System (NWSS) partnering with major projects like WastewaterSCAN. 
+
+This report utilizes the CDC Wastewater Viral Activity Level (WVAL), which records weekly surveillance measurements across U.S wastewater treatment faculties for respiratory pathogens SARS-COV-2, Influenza A and Respiratory syncytial virus (RSV).  
+
+
+## Objectives
+1. Load the wastewater surveillance dataset from the online repository (Limited to 50,000 rows of data, since the dataset has over 500K)
+
+2. Construct summary tables evaluating categorical viral activity 
+
+3. Visualize the viral activity levels over time to identify seasonal trends 
+
+
+## References
+
+https://www.cdc.gov/wastewater/about-data/index.html
+
+https://pmc-ncbi-nlm-nih-gov.proxy.library.emory.edu/articles/PMC11312382/
+
+https://www.nature.com/articles/s41370-024-00683-w#citeas
+
+
+
+
+## Load data
+Data loaded from data.cdc.gov via url.
+```{r, load-data}
+
+library(here)
+
+here::i_am("final/WW_project_v2.Rmd")
+
+path_to_data <- here::here("data/clean_data.rds")
+
+```
+
+### Variables of interest:
+
+ **pathogen_target**: Pathogen for which wastewater viral activity levels calculated
+
+ **week_end**: Last date in one week time period for CDC/MMWR reporting week
+
+ **Site_WVAL_Category**: Category for the calculated site WVAL for the CDC/MMWR reporting week. Categories are ordinal based on pathogen       specific cut-offs of WVAL values: 
+    very low,
+    low, moderate,
+    high, 
+    very high;
+    limited/no data: category when there is insufficient data to calculate a WVAL.
+
+
+ **Site_WVAL**: The calculated site wastewater viral activity level (WVAL) for the CDC/MMWR reporting week
+
+
+## Analysis Table
+The table below summarizes the distribution of weekly site level viral activity categories grouped by pathogens (pathogen_target) across 2026. 
+```{r}
+
+
+summary_tbl<- readRDS(
+  file=here::here("final/data/summary_tbl.rds")
+)
+
+summary_tbl
+
+
+
+
+
+
+
+
+```
+
+
+
+## Visualizing Analysis 
+
+To observing pathogen trajectories over 2026, I aggregated the mean weekly site viral activity metric (site_WVAL). 
+```{r}
+
+#| fig.align = "center",
+#| out.width = "100px"
+knitr::include_graphics(
+  here::here("final/data/graph.png"),
+
+)
+
+
+```
+
+The line graph above illustrates the evolution of average viral concentration levels in U.S. wastewater from June 2026 to September 2026. The x-axis tracks weekly reporting dates (week_end), while the y-axis reflects the average calculated viral activity level (mean_wval).  Pathogens are color coded, Influenza A in red, RSV in blue, SARS-COV-2 in green. SARS-COV-2 has maintained activity throughout the year, with a peak in August with a mean viral activity of 700. Influenza A started to show a minor peak of viral activity around 75. RSV has remained near zero throughout this time period, with a minor peak of 50 viral activity around July. 
+
